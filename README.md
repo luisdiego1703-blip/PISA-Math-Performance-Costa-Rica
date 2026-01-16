@@ -209,7 +209,7 @@ cd PISA-Math-Performance-Costa-Rica
 **Luis Diego Chavarría-Brenes**
 
 - 📧 Email: luisdiego.1703@gmail.com
-- 💼 LinkedIn: [linkedin.com/in/tu-perfil](https://linkedin.com/in/tu-perfil)
+- 💼 LinkedIn: www.linkedin.com/in/ldcb
 - 🎓 Estudiante de Maestría en Estadística, Universidad de Costa Rica
 
 ---
