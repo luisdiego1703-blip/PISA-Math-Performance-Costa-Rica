@@ -1,0 +1,38 @@
+# R files
+.Rhistory
+.RData
+.Rproj.user
+*.Rproj
+
+# R Markdown
+*.html
+*.pdf
+*_cache/
+*_files/
+
+# Data files (uncomment if data is too large or sensitive)
+# *.csv
+# *.xlsx
+# *.rds
+
+# System files
+.DS_Store
+Thumbs.db
+.directory
+
+# Temporary files
+*.tmp
+*.temp
+~$*
+
+# Logs
+*.log
+
+# Output files you don't want to track
+# outputs/*.txt
+# outputs/*.csv
+
+# Personal notes
+notes.txt
+TODO.md
+draft/

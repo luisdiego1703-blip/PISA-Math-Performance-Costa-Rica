@@ -1,0 +1,733 @@
+---
+title: "<span style='color:#1E90FF;'>Proyecto - NP1601</span>"
+author: "<span style='color:#1C1C1C;'>Luis Diego Chavarría Brenes</span>"
+date: "<span style='color:#1C1C1C;'>27 de Octubre, 2025</span>"
+output:
+  slidy_presentation:
+    css: styles.css
+    keep_md: false
+    self_contained: true
+  beamer_presentation: default
+---
+
+```{r}
+#LIBRERIAS
+# Manipulación y visualización de datos
+library(tidyverse)
+
+# Limpieza y exploración de datos
+library(janitor)
+library(psych)
+library(skimr)
+library(data.table)
+
+# Modelado y diagnóstico estadístico
+library(MASS)
+library(car)
+library(lmtest)
+library(performance)
+library(broom)
+
+# Visualización y análisis de correlaciones
+library(corrplot)
+library(RColorBrewer)
+library(reshape2)
+
+# Reportes y tablas
+library(knitr)
+library(kableExtra)
+
+
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,      # muestra el código
+  warning = FALSE,  # oculta warnings
+  message = FALSE   # oculta mensajes (ej. de librerías)
+)
+```
+
+# Preparación y Limpieza de Datos
+
+```{r}
+
+datos <- fread("C:/Maestria/Maestria/UCR Maestria/NP1601 Métodos, regresión y diseño de experimentos/Articulo/Proyecto/base.csv", na.strings = c("", "NA", "NaN"))
+
+# Nombres limpios y consistentes
+datos <- clean_names(datos)
+
+datos <- datos %>%
+  mutate(
+    # Factores (sin acentos para evitar errores de codificación)
+    sex = factor(sex, levels = c("M", "F"), labels = c("Masculino", "Femenino")),
+    rur = factor(rur, levels = c(0, 1), labels = c("Urbano", "Rural")),
+    pub = factor(pub, levels = c(0, 1), labels = c("Privado", "Publico")),
+    pro_an = as.numeric(pro_an),
+    pro_cd = as.numeric(pro_cd),
+    pro_bu = as.numeric(pro_bu),
+    mat = as.numeric(mat)
+  ) %>%
+  
+  # Convertir ítems de las escalas a numéricos
+  mutate(across(c(am1:am6, cd1:cd6, bu1:bu6), as.numeric))
+
+
+# Ansiedad Matemática
+cat("\n--- Alfa de Cronbach: Ansiedad Matemática ---\n")
+alpha(datos[, c("am1","am2","am3","am4","am5","am6")])
+
+# Clima Disciplinario
+cat("\n--- Alfa de Cronbach: Clima Disciplinario ---\n")
+alpha(datos[, c("cd1","cd2","cd3","cd4","cd5","cd6")])
+
+# Bullying
+cat("\n--- Alfa de Cronbach: Recepción de Bullying ---\n")
+alpha(datos[, c("bu1","bu2","bu3","bu4","bu5","bu6")])
+
+
+cat("\n--- Resumen descriptivo (skimr) ---\n")
+skim(dplyr::select(datos, pro_an, pro_cd, pro_bu, mat, sex, rur, pub))
+
+```
+
+#Tratamiento de valores faltantes (NA)
+```{r}
+# Ver cuántos valores faltantes hay por variable
+colSums(is.na(datos))
+
+```
+
+
+# EDA: correlaciones y dispersión; revisión preliminar de colinealidad.
+
+```{r}
+datos_cor <- datos %>%
+  mutate(
+    sex_num = ifelse(sex == "Masculino", 1, 0),
+    pub_num = ifelse(pub == "Publico", 1, 0)
+  ) %>%
+  dplyr::select(mat, pro_an, pro_cd, pro_bu, sex_num, pub_num) %>%
+  dplyr::mutate(across(everything(), as.numeric)) %>%
+  tidyr::drop_na()
+
+# Calcular correlaciones
+correlaciones <- cor(datos_cor, method = "pearson")
+
+# Mostrar matriz
+print(round(correlaciones, 3))
+
+# Graficar
+corrplot(correlaciones,
+         method = "color",          
+         type = "upper",            
+         addCoef.col = "black",     
+         number.cex = 0.8,          
+         tl.col = "black",          
+         tl.srt = 45,               
+         col = colorRampPalette(c("#B2182B", "#F7F7F7", "#2166AC"))(200),
+         diag = FALSE,              
+         mar = c(0,0,2,0),          
+         title = "Matriz de correlaciones con variables numéricas y codificadas")
+
+# Preparar datos
+datos_cor <- datos %>%
+  mutate(
+    sex_num = ifelse(sex == "Masculino", 1, 0),
+    pub_num = ifelse(pub == "Publico", 1, 0)
+  ) %>%
+  dplyr::select(mat, pro_an, pro_cd, pro_bu, sex_num, pub_num) %>%
+  dplyr::mutate(across(everything(), as.numeric)) %>%
+  tidyr::drop_na()
+
+# Calcular correlaciones de Pearson
+correlaciones <- cor(datos_cor, method = "pearson")
+
+# Redondear y mostrar matriz
+print(round(correlaciones, 3))
+
+# ────────────────────────────────────────────────
+# Gráfico con estilo INEC
+# ────────────────────────────────────────────────
+corrplot(
+  correlaciones,
+  method = "color",            # Colores en matriz
+  type = "upper",              # Solo mitad superior
+  addCoef.col = "black",       # Muestra coeficientes
+  number.cex = 0.75,           # Tamaño de texto coeficientes
+  tl.col = "black",            # Color de etiquetas
+  tl.srt = 45,                 # Rotación de etiquetas
+  col = colorRampPalette(c("#B2182B", "#F7F7F7", "#2166AC"))(200), # Paleta institucional
+  diag = FALSE,                # No mostrar diagonal
+  mar = c(0,0,2,0),            # Márgenes
+  title = "Figura 3. Matriz de Correlaciones entre Variables Cuantitativas y Codificadas",
+  cl.pos = "r"                 # Leyenda de colores a la derecha
+)
+
+# Agregar pie de fuente (simulado para estilo INEC)
+mtext("Fuente: Elaboración propia con base en datos de PISA 2022 (OCDE, 2023).", 
+      side = 1, line = 4, adj = 1, cex = 0.7, col = "gray40", family = "Arial")
+
+```
+
+
+```{r}
+
+# Crear dataset reducido
+datos_graf <- datos %>%
+  dplyr::select(mat, pro_an, pro_cd, pro_bu, sex, pub) %>%
+  tidyr::drop_na()
+
+# Ansiedad Matemática
+ggplot(datos_graf, aes(x = pro_an, y = mat, color = sex)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE, color = "black") +
+  labs(title = "Relación entre Ansiedad Matemática y Nota en Matemáticas",
+       x = "Promedio de Ansiedad Matemática",
+       y = "Nota en Matemáticas (Estandarizada)") +
+  theme_minimal()
+
+# Clima Disciplinario
+ggplot(datos_graf, aes(x = pro_cd, y = mat, color = sex)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE, color = "black") +
+  labs(title = "Relación entre Clima Disciplinario y Nota en Matemáticas",
+       x = "Promedio de Clima Disciplinario",
+       y = "Nota en Matemáticas (Estandarizada)") +
+  theme_minimal()
+
+# Recepción de Bullying
+ggplot(datos_graf, aes(x = pro_bu, y = mat, color = sex)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE, color = "black") +
+  labs(title = "Relación entre Recepción de Bullying y Nota en Matemáticas",
+       x = "Promedio de Recepción de Bullying",
+       y = "Nota en Matemáticas (Estandarizada)") +
+  theme_minimal()
+
+```
+
+
+
+```{r}
+
+variables_numericas <- datos %>%
+  dplyr::select(mat, pro_an, pro_cd, pro_bu) %>%
+  tidyr::drop_na()
+
+# Tabla descriptiva (media, mediana, sd, min, max, curtosis y sesgo)
+tabla_desc <- psych::describe(variables_numericas) %>%
+  as.data.frame() %>%
+  dplyr::select(mean, sd, median, min, max, skew, kurtosis, n)
+
+print(tabla_desc)
+  
+# Nota en matemáticas
+ggplot(datos, aes(x = mat)) +
+  geom_histogram(aes(y = ..density..), bins = 30, fill = "#4DAF4A", color = "black", alpha = 0.7) +
+  geom_density(color = "black", size = 1.1) +
+  labs(title = "Distribución de la Nota en Matemáticas",
+       x = "Nota estandarizada (0–800)",
+       y = "Densidad") +
+  theme_minimal()
+
+# Ansiedad Matemática
+ggplot(datos, aes(x = pro_an)) +
+  geom_histogram(aes(y = ..density..), bins = 20, fill = "#E41A1C", color = "black", alpha = 0.7) +
+  geom_density(color = "black", size = 1.1) +
+  labs(title = "Distribución del Promedio de Ansiedad Matemática",
+       x = "Promedio de Ansiedad Matemática (1–4)",
+       y = "Densidad") +
+  theme_minimal()
+
+# Clima Disciplinario
+ggplot(datos, aes(x = pro_cd)) +
+  geom_histogram(aes(y = ..density..), bins = 20, fill = "#377EB8", color = "black", alpha = 0.7) +
+  geom_density(color = "black", size = 1.1) +
+  labs(title = "Distribución del Promedio de Clima Disciplinario",
+       x = "Promedio de Clima Disciplinario (1–4)",
+       y = "Densidad") +
+  theme_minimal()
+
+# Recepción de Bullying
+ggplot(datos, aes(x = pro_bu)) +
+  geom_histogram(aes(y = ..density..), bins = 20, fill = "#984EA3", color = "black", alpha = 0.7) +
+  geom_density(color = "black", size = 1.1) +
+  labs(title = "Distribución del Promedio de Recepción de Bullying",
+       x = "Promedio de Recepción de Bullying (1–4)",
+       y = "Densidad") +
+  theme_minimal()
+
+# Nota por sexo
+ggplot(datos, aes(x = sex, y = mat, fill = sex)) +
+  geom_boxplot(alpha = 0.7) +
+  labs(title = "Distribución de la Nota en Matemáticas según Sexo",
+       x = "Sexo", y = "Nota estandarizada (0–800)") +
+  theme_minimal() +
+  scale_fill_manual(values = c("#E41A1C", "#377EB8"))
+
+# Nota por tipo de institución
+ggplot(datos, aes(x = pub, y = mat, fill = pub)) +
+  geom_boxplot(alpha = 0.7) +
+  labs(title = "Distribución de la Nota en Matemáticas según Tipo de Institución",
+       x = "Tipo de institución", y = "Nota estandarizada (0–800)") +
+  theme_minimal() +
+  scale_fill_manual(values = c("#4DAF4A", "#984EA3"))
+
+```
+
+
+# Modelado:  backward/forward/stepwise.
+
+```{r}
+
+# Crear dataset con las variables relevantes
+datos_modelo <- datos %>%
+  dplyr::select(mat, pro_an, pro_cd, pro_bu, sex, pub) %>%
+  tidyr::drop_na()
+
+cat("Número de casos utilizados en el modelo:", nrow(datos_modelo), "\n")
+
+# Asegurar que las variables categóricas sean factores
+datos_modelo <- datos_modelo %>%
+  mutate(
+    sex = as.factor(sex),
+    pub = as.factor(pub)
+  )
+
+# Modelo lineal completo
+(modelo_completo <- lm(mat ~ pro_an + pro_cd + pro_bu + sex + pub, data = datos_modelo))
+
+cat("\n--- MODELO COMPLETO ---\n")
+summary(modelo_completo)
+
+# Selección de modelos --------------------------------------
+
+# Backward (eliminación hacia atrás)
+(modelo_backward <- stepAIC(modelo_completo, direction = "backward"))
+
+# Forward (selección hacia adelante)
+(modelo_forward <- stepAIC(
+  lm(mat ~ 1, data = datos_modelo),
+  scope = list(lower = ~1, upper = ~ pro_an + pro_cd + pro_bu + sex + pub),
+  direction = "forward"
+))
+# Stepwise (combinado)
+(modelo_stepwise <- stepAIC(modelo_completo, direction = "both"))
+
+
+```
+
+
+# Validación de los supuestos del modelo lineal
+
+```{r}
+#residuos y valores ajustados 
+residuos <- residuals(modelo_stepwise)
+valores_ajustados <- fitted(modelo_stepwise)
+
+df_residuos <- data.frame(residuos, valores_ajustados)
+
+
+# Gráfico Q-Q
+ggplot(df_residuos, aes(sample = residuos)) +
+  stat_qq(color = "#377EB8", alpha = 0.7) +
+  stat_qq_line(color = "red", size = 1.2) +
+  theme_minimal(base_size = 13) +
+  labs(title = "Gráfico Q-Q de los residuos",
+       x = "Cuantiles teóricos",
+       y = "Cuantiles observados") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5))
+
+# Histograma con curva de densidad
+ggplot(df_residuos, aes(x = residuos)) +
+  geom_histogram(aes(y = ..density..),
+                 bins = 30,
+                 fill = "#B3CDE3",
+                 color = "black",
+                 alpha = 0.8) +
+  geom_density(color = "#E41A1C", size = 1.2) +
+  theme_minimal(base_size = 13) +
+  labs(title = "Distribución de los residuos del modelo",
+       x = "Residuos",
+       y = "Densidad") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5))
+
+# Pruebas formales
+cat("\n--- Prueba de Shapiro-Wilk ---\n")
+print(shapiro.test(sample(residuos, 5000)))  
+
+cat("\n--- Prueba de Kolmogorov-Smirnov ---\n")
+print(ks.test(scale(residuos), "pnorm"))
+
+
+ggplot(df_residuos, aes(x = valores_ajustados, y = residuos)) +
+  geom_point(alpha = 0.4, color = "blue") +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed", size = 1) +
+  theme_minimal(base_size = 13) +
+  labs(title = "Residuos vs Valores ajustados",
+       x = "Valores ajustados",
+       y = "Residuos") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5))
+
+# Prueba de Breusch–Pagan
+cat("\n--- Prueba de Breusch–Pagan ---\n")
+print(bptest(modelo_stepwise))
+
+
+cat("\n--- Prueba de Durbin–Watson ---\n")
+print(durbinWatsonTest(modelo_stepwise))
+
+```
+
+
+# Linealidad
+
+```{r}
+
+#Residuales
+crPlots(
+  modelo_stepwise,
+  main = "Gráficos Parciales de Regresión\n(Comprobación de Linealidad)",
+  col = "#1B9E77",        
+  pch = 19,                
+  lwd = 2,                 
+  grid = T,            
+  smooth = T,          
+  col.lines = "#D95F02",  
+  col.smooth = "#7570B3",  
+  cex.main = 1.2,          
+  cex.lab = 1.1,           
+  cex.axis = 0.9           
+)
+
+#  Gráfico de residuos vs predictores individuales 
+
+residuos_df <- cbind(datos_modelo, resid = residuals(modelo_stepwise))
+
+#relación de residuos con cada predictor
+
+ggplot(residuos_df, aes(x = pro_an, y = resid)) +
+  geom_point(alpha = 0.5, color = "#377EB8") +
+  geom_smooth(method = "loess", se = FALSE, color = "red", linewidth = 1.2) +
+  labs(title = "Residuos vs Ansiedad Matemática",
+       x = "Promedio de Ansiedad Matemática", y = "Residuos") +
+  theme_minimal()
+
+ggplot(residuos_df, aes(x = pro_cd, y = resid)) +
+  geom_point(alpha = 0.5, color = "#4DAF4A") +
+  geom_smooth(method = "loess", se = FALSE, color = "red", linewidth = 1.2) +
+  labs(title = "Residuos vs Clima Disciplinario",
+       x = "Promedio de Clima Disciplinario", y = "Residuos") +
+  theme_minimal()
+
+ggplot(residuos_df, aes(x = pro_bu, y = resid)) +
+  geom_point(alpha = 0.5, color = "#E41A1C") +
+  geom_smooth(method = "loess", se = FALSE, color = "red", linewidth = 1.2) +
+  labs(title = "Residuos vs Recepción de Bullying",
+       x = "Promedio de Bullying", y = "Residuos") +
+  theme_minimal()
+
+
+# Calcular el Factor de Inflación de la Varianza (VIF)
+vif_valores <- vif(modelo_stepwise)
+
+# Mostrar resultados ordenados
+vif_valores <- sort(vif_valores, decreasing = TRUE)
+print(vif_valores)
+
+# Interpretación automática
+interpretacion_vif <- ifelse(vif_valores < 5, "No hay multicolinealidad preocupante",
+                       ifelse(vif_valores < 10, "Multicolinealidad moderada, se debe revisar",
+                              "Multicolinealidad severa, conviene eliminar o combinar variables"))
+interpretacion_vif <- data.frame(
+  Variable = names(vif_valores),
+  VIF = round(vif_valores, 2),
+  Interpretación = interpretacion_vif
+)
+print(interpretacion_vif)
+
+```
+
+# Pruebas
+
+```{r}
+#  Intervalos de confianza para los coeficientes
+
+intervalos <- confint(modelo_stepwise, level = 0.95)
+print(intervalos)
+
+# ANOVA del modelo
+
+anova_result <- anova(modelo_stepwise)
+print(anova_result)
+
+# Decisión automática según p-valor
+p_valor <- anova_result$`Pr(>F)`[1]
+if (!is.na(p_valor)) {
+  if (p_valor < 0.05) {
+    cat("p < 0.05 → Se rechaza H0. El modelo es globalmente significativo.\n")
+  } else {
+    cat(" p ≥ 0.05 → No se rechaza H0. El modelo no es significativo.\n")
+  }
+}
+
+
+```
+
+```{r}
+# --- Por Sexo ---
+t_sexo <- t.test(mat ~ sex, data = datos_modelo, var.equal = FALSE)
+t_sexo
+
+# --- Por Tipo de Institución ---
+t_pub <- t.test(mat ~ pub, data = datos_modelo, var.equal = FALSE)
+t_pub
+
+
+#ANOVA para variables continuas agrupadas (Ansiedad, Clima, Bullying)
+
+```
+
+
+```{r}
+# Ansiedad Matemática
+modelo_an <- lm(mat ~ pro_an, data = datos_modelo)
+cat("\n--- Regresión simple: Ansiedad Matemática ---\n")
+summary(modelo_an)
+
+# Clima Disciplinario
+modelo_cd <- lm(mat ~ pro_cd, data = datos_modelo)
+cat("\n--- Regresión simple: Clima Disciplinario ---\n")
+summary(modelo_cd)
+
+# Bullying
+modelo_bu <- lm(mat ~ pro_bu, data = datos_modelo)
+cat("\n--- Regresión simple: Recepción de Bullying ---\n")
+summary(modelo_bu)
+
+
+```
+
+
+```{r}
+
+library(tidyverse)
+library(corrplot)
+library(broom)
+library(car)
+library(kableExtra)
+
+# ────────────────────────────────────────────────
+# DEFINICIÓN DE TEMA PERSONALIZADO
+# ────────────────────────────────────────────────
+tema <- function() {
+  theme_minimal(base_family = "Arial") %+replace%
+    theme(
+      plot.title = element_text(face = "bold", size = 12, hjust = 0.5, color = "#003366"),
+      plot.subtitle = element_text(size = 10, hjust = 0.5, color = "#003366"),
+      plot.caption = element_text(size = 8, hjust = 1, color = "gray40"),
+      axis.title = element_text(size = 10, face = "bold"),
+      axis.text = element_text(size = 9, color = "black"),
+      panel.grid.major = element_line(color = "#D9D9D9"),
+      panel.grid.minor = element_blank(),
+      legend.position = "bottom",
+      legend.title = element_text(face = "bold"),
+      legend.text = element_text(size = 9),
+      plot.margin = margin(10, 10, 10, 10)
+    )
+}
+
+# ────────────────────────────────────────────────
+# FIGURA 1. DISTRIBUCIÓN DE LA NOTA EN MATEMÁTICAS
+# ────────────────────────────────────────────────
+ggplot(datos, aes(x = mat)) +
+  geom_histogram(aes(y = ..density..), bins = 30, fill = "#0072B2", color = "black", alpha = 0.7) +
+  geom_density(color = "#003366", size = 1.1) +
+  labs(
+    title = "Figura 1. Distribución de la Nota en Matemáticas",
+    subtitle = "Evaluación PISA 2022, Costa Rica",
+    x = "Nota estandarizada (0–800)",
+    y = "Densidad",
+    caption = "Fuente: Elaboración propia con base en datos de PISA 2022 (OCDE, 2023)."
+  ) +
+  tema()
+
+# ────────────────────────────────────────────────
+# FIGURA 2. DISTRIBUCIÓN DE VARIABLES ACTITUDINALES
+# ────────────────────────────────────────────────
+datos_long <- datos %>%
+  dplyr::select(pro_an, pro_cd, pro_bu) %>%
+  tidyr::pivot_longer(cols = everything(),
+                      names_to = "Variable",
+                      values_to = "Valor")
+
+ggplot(datos_long, aes(x = Valor, fill = Variable)) +
+  geom_histogram(aes(y = ..density..), bins = 20, color = "black", alpha = 0.6) +
+  geom_density(color = "#003366", size = 0.8) +
+  facet_wrap(~ Variable, scales = "free", ncol = 3) +
+  scale_fill_manual(values = c("pro_an" = "#E41A1C", "pro_cd" = "#0072B2", "pro_bu" = "#009E73")) +
+  labs(
+    title = "Figura 2. Distribución de las Variables Actitudinales",
+    subtitle = "Ansiedad Matemática, Clima Disciplinario y Bullying",
+    x = "Valor promedio (escala 1–4)",
+    y = "Densidad",
+    caption = "Fuente: Elaboración propia con base en datos de PISA 2022 (OCDE, 2023)."
+  ) +
+  tema()
+
+# ────────────────────────────────────────────────
+# FIGURA 3. MATRIZ DE CORRELACIONES
+# ────────────────────────────────────────────────
+correlaciones <- cor(datos[, c("mat", "pro_an", "pro_cd", "pro_bu")], use = "complete.obs")
+
+corrplot(correlaciones,
+         method = "color",
+         type = "upper",
+         addCoef.col = "black",
+         number.cex = 0.7,
+         tl.col = "black",
+         tl.srt = 45,
+         col = colorRampPalette(c("#B2182B", "#F7F7F7", "#2166AC"))(200),
+         title = "Figura 3. Matriz de Correlaciones entre Variables Cuantitativas",
+         mar = c(0,0,2,0))
+
+# ────────────────────────────────────────────────
+# FIGURAS 4. ASIEDAD MATEMÁTICA
+# ────────────────────────────────────────────────
+
+ggplot(datos, aes(x = pro_an, y = mat, color = sex)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE, color = "#003366") +
+  scale_color_manual(values = c("#0072B2", "#66CCFF")) +
+  labs(
+    title = "Figura 4. Relación entre Ansiedad Matemática y Nota en Matemáticas",
+    x = "Promedio de Ansiedad Matemática",
+    y = "Nota en Matemáticas (0–800)",
+    color = "Sexo",
+    caption = "Fuente: Elaboración propia con base en datos de PISA 2022 (OCDE, 2023)."
+  ) +
+  tema()
+
+# ────────────────────────────────────────────────
+# FIGURA 5. CLIMA DISCIPLINARIO
+# ────────────────────────────────────────────────
+
+ggplot(datos, aes(x = pro_cd, y = mat, color = sex)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE, color = "#003366") +
+  scale_color_manual(values = c("#0072B2", "#E69F00")) +
+  labs(
+    title = "Figura 5. Relación entre Clima Disciplinario y Nota en Matemáticas",
+    x = "Promedio de Clima Disciplinario",
+    y = "Nota (0–800)",
+    caption = "Fuente: Elaboración propia con base en datos de PISA 2022 (OCDE, 2023)."
+  ) +
+  tema()
+
+
+# ────────────────────────────────────────────────
+# FIGURA 6. RECEPCIÓN DE BULLYING
+# ────────────────────────────────────────────────
+
+ggplot(datos, aes(x = pro_bu, y = mat, color = sex)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE, color = "#003366") +
+  scale_color_manual(values = c("#009E73", "#56B4E9")) +
+  labs(
+    title = "Figura 6. Relación entre Recepción de Bullying y Nota en Matemáticas",
+    x = "Promedio de Recepción de Bullying",
+    y = "Nota (0–800)",
+    caption = "Fuente: Elaboración propia con base en datos de PISA 2022 (OCDE, 2023)."
+  ) +
+  tema()
+
+# ────────────────────────────────────────────────
+# FIGURA 7. NOTA SEGÚN SEXO
+# ────────────────────────────────────────────────
+ggplot(datos, aes(x = sex, y = mat, fill = sex)) +
+  geom_boxplot(alpha = 0.7, color = "#003366") +
+  scale_fill_manual(values = c("#0072B2", "#66CCFF")) +
+  labs(
+    title = "Figura 7. Nota en Matemáticas según Sexo",
+    x = "Sexo", y = "Nota estandarizada (0–800)",
+    caption = "Fuente: Elaboración propia con base en datos de PISA 2022 (OCDE, 2023)."
+  ) +
+  tema()
+
+# ────────────────────────────────────────────────
+# FIGURA 8. NOTA SEGÚN TIPO DE INSTITUCIÓN
+# ────────────────────────────────────────────────
+ggplot(datos, aes(x = pub, y = mat, fill = pub)) +
+  geom_boxplot(alpha = 0.7, color = "#003366") +
+  scale_fill_manual(values = c("#009E73", "#56B4E9")) +
+  labs(
+    title = "Figura 8. Nota en Matemáticas según Tipo de Institución",
+    x = "Tipo de institución", y = "Nota estandarizada (0–800)",
+    caption = "Fuente: Elaboración propia con base en datos de PISA 2022 (OCDE, 2023)."
+  ) +
+  tema()
+
+# ────────────────────────────────────────────────
+# FIGURA 9. COEFICIENTES DEL MODELO FINAL (STEPWISE)
+# ────────────────────────────────────────────────
+coef_df <- tidy(modelo_stepwise)
+ggplot(coef_df[-1,], aes(x = reorder(term, estimate), y = estimate)) +
+  geom_col(fill = "#0072B2", alpha = 0.8) +
+  geom_errorbar(aes(ymin = estimate - std.error, ymax = estimate + std.error), width = 0.2) +
+  coord_flip() +
+  labs(
+    title = "Figura 9. Coeficientes del Modelo de Regresión Final (Stepwise)",
+    x = "Predictores", y = "Coeficiente estimado (β)",
+    caption = "Fuente: Elaboración propia con base en datos de PISA 2022 (OCDE, 2023)."
+  ) +
+  tema()
+
+# ────────────────────────────────────────────────
+# FIGURA 10. GRÁFICO Q–Q DE LOS RESIDUOS
+# ────────────────────────────────────────────────
+residuos <- residuals(modelo_stepwise)
+ggplot(data.frame(residuos), aes(sample = residuos)) +
+  stat_qq(color = "#0072B2", alpha = 0.7) +
+  stat_qq_line(color = "#003366", lwd = 1) +
+  labs(
+    title = "Figura 10 Gráfico Q–Q de los Residuos",
+    subtitle = "Evaluación de la normalidad del modelo",
+    x = "Cuantiles teóricos", y = "Cuantiles de los residuos",
+    caption = "Fuente: Elaboración propia con base en datos de PISA 2022 (OCDE, 2023)."
+  ) +
+  tema()
+
+# ────────────────────────────────────────────────
+# FIGURA 11. RESIDUOS VS VALORES AJUSTADOS
+# ────────────────────────────────────────────────
+valores_ajustados <- fitted(modelo_stepwise)
+ggplot(data.frame(valores_ajustados, residuos), aes(x = valores_ajustados, y = residuos)) +
+  geom_point(alpha = 0.5, color = "#009E73") +
+  geom_hline(yintercept = 0, color = "#003366", lwd = 1) +
+  labs(
+    title = "Figura 11. Residuos vs Valores Ajustados",
+    subtitle = "Evaluación de homocedasticidad",
+    x = "Valores ajustados", y = "Residuos",
+    caption = "Fuente: Elaboración propia con base en datos de PISA 2022 (OCDE, 2023)."
+  ) +
+  tema()
+
+# ────────────────────────────────────────────────
+# FIGURA 12. FACTORES DE INFLACIÓN DE LA VARIANZA (VIF)
+# ────────────────────────────────────────────────
+vif_df <- data.frame(Variable = names(vif(modelo_stepwise)), VIF = vif(modelo_stepwise))
+ggplot(vif_df, aes(x = reorder(Variable, VIF), y = VIF)) +
+  geom_col(fill = "#0072B2", alpha = 0.8) +
+  coord_flip() +
+  geom_hline(yintercept = 5, color = "red", linetype = "dashed") +
+  labs(
+    title = "Figura 12. Factores de Inflación de la Varianza (VIF)",
+    subtitle = "Evaluación de la multicolinealidad",
+    x = "Variable", y = "VIF",
+    caption = "Fuente: Elaboración propia con base en datos de PISA 2022 (OCDE, 2023)."
+  ) +
+  tema()
+
+```
+
