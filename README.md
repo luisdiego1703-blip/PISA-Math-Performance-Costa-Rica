@@ -87,7 +87,7 @@ El rendimiento matemático no depende únicamente de habilidades cognitivas. Est
 
 > **Nota sobre R²**: En ciencias sociales y educación, valores de R² entre 0.10-0.30 son típicos y aceptables debido a la naturaleza multifactorial del comportamiento humano. El 79% de varianza no explicada incluye factores como habilidad innata, motivación intrínseca, calidad docente, ambiente familiar y otros elementos no medidos.
 
-### Coeficientes del Modelo (Todos significativos)
+### Coeficientes del Modelo
 
 | Predictor | Coeficiente (β) | p-value | Interpretación |
 |-----------|----------------|---------|----------------|
