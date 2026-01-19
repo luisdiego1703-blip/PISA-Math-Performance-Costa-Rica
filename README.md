@@ -122,13 +122,13 @@ El proyecto incluye 12 figuras que documentan todo el proceso analítico:
 
 ### Ejemplos Visuales
 
-![Matriz de Correlación](outputs/figures/figura_03_matriz_correlacion.png)
+![Matriz de Correlación](outputs/figures/figura3)
 *Matriz de correlación entre variables del modelo*
 
-![Coeficientes del Modelo](outputs/figures/figura_09_coeficientes.png)
+![Coeficientes del Modelo](outputs/figures/figura9)
 *Coeficientes estimados del modelo con intervalos de confianza al 95%*
 
-![Q-Q Plot](outputs/figures/figura_10_qq_plot.png)
+![Q-Q Plot](outputs/figures/figura10)
 *Gráfico Q-Q para validación de normalidad de residuos*
 
 ![Residuos vs Ajustados](outputs/figures/figura_11_residuos.png)
