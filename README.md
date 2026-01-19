@@ -2,6 +2,8 @@
  
 [![R](https://img.shields.io/badge/R-276DC3?style=flat&logo=r&logoColor=white)](https://www.r-project.org/)
 [![Status](https://img.shields.io/badge/Status-Completed-success)](https://github.com/tu-usuario/PISA-Math-Performance-Costa-Rica)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Last Update](https://img.shields.io/badge/Last_Update-Jan_2026-blue)](https://github.com/tu-usuario/PISA-Math-Performance-Costa-Rica)
 
 ##  Objetivo del Proyecto
 
