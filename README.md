@@ -129,24 +129,20 @@ El proyecto incluye 12 figuras que documentan todo el proceso analítico:
     <td width="50%" align="center">
       <img src="outputs/figures/figura3.png" alt="Matriz de Correlación" width="90%"/>
       <br>
-      <em>Matriz de correlación entre variables del modelo</em>
     </td>
     <td width="50%" align="center">
       <img src="outputs/figures/figura9.png" alt="Coeficientes" width="90%"/>
       <br>
-      <em>Coeficientes estimados con intervalos de confianza al 95%</em>
     </td>
   </tr>
   <tr>
     <td width="50%" align="center">
       <img src="outputs/figures/figura10.png" alt="Q-Q Plot" width="90%"/>
       <br>
-      <em>Gráfico Q-Q para validación de normalidad</em>
     </td>
     <td width="50%" align="center">
       <img src="outputs/figures/figura11.png" alt="Residuos" width="90%"/>
       <br>
-      <em>Diagnóstico de homocedasticidad</em>
     </td>
   </tr>
 </table>
