@@ -120,6 +120,19 @@ El proyecto incluye 12 figuras que documentan todo el proceso analítico:
 - **Figuras 10-11**: Diagnóstico de residuos (Q-Q plot, residuos vs ajustados)
 - **Figura 12**: Análisis de multicolinealidad (VIF)
 
+### Ejemplos Visuales
+
+![Matriz de Correlación](outputs/figures/figura_03_matriz_correlacion.png)
+*Matriz de correlación entre variables del modelo*
+
+![Coeficientes del Modelo](outputs/figures/figura_09_coeficientes.png)
+*Coeficientes estimados del modelo con intervalos de confianza al 95%*
+
+![Q-Q Plot](outputs/figures/figura_10_qq_plot.png)
+*Gráfico Q-Q para validación de normalidad de residuos*
+
+![Residuos vs Ajustados](outputs/figures/figura_11_residuos.png)
+*Diagnóstico de homocedasticidad: residuos vs valores ajustados*
 
 ---
 
