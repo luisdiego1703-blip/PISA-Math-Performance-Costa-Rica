@@ -131,7 +131,7 @@ El proyecto incluye 12 figuras que documentan todo el proceso analítico:
 ![Q-Q Plot](outputs/figures/figura10.png)
 *Gráfico Q-Q para validación de normalidad de residuos*
 
-![Residuos vs Ajustados](outputs/figures/figura_11_residuos.png)
+![Residuos vs Ajustados](outputs/figures/figura11.png)
 *Diagnóstico de homocedasticidad: residuos vs valores ajustados*
 ---
 
