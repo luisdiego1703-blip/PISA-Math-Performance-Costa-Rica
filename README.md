@@ -1,17 +1,17 @@
-#  Análisis del Rendimiento Matemático en Costa Rica: Datos PISA 2022
+# 📊 Análisis del Rendimiento Matemático en Costa Rica: Datos PISA 2022
  
 [![R](https://img.shields.io/badge/R-276DC3?style=flat&logo=r&logoColor=white)](https://www.r-project.org/)
 [![Status](https://img.shields.io/badge/Status-Completed-success)](https://github.com/tu-usuario/PISA-Math-Performance-Costa-Rica)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Last Update](https://img.shields.io/badge/Last_Update-Jan_2026-blue)](https://github.com/tu-usuario/PISA-Math-Performance-Costa-Rica)
 
-##  Objetivo del Proyecto
+## 🎯 Objetivo del Proyecto
 
 Identificar y cuantificar los factores socioemocionales, disciplinarios y estructurales que influyen en el rendimiento matemático de estudiantes costarricenses mediante análisis estadístico riguroso de datos PISA 2022.
 
 ---
 
-##  Descripción
+## 📖 Descripción
 
 Este proyecto analiza el desempeño en matemáticas de **6,113 estudiantes costarricenses** usando datos del Programa para la Evaluación Internacional de Alumnos (PISA) 2022. A través de regresión lineal múltiple, se identifican predictores clave del rendimiento académico, incluyendo factores emocionales, ambientales y estructurales del sistema educativo.
 
@@ -23,7 +23,7 @@ El rendimiento matemático no depende únicamente de habilidades cognitivas. Est
 ---
 ---
 
-##  Dataset
+## 📊 Dataset
 
 - **Fuente**: PISA 2022 - OECD
 - **País**: Costa Rica
@@ -44,7 +44,7 @@ El rendimiento matemático no depende únicamente de habilidades cognitivas. Est
 
 ---
 
-##  Metodología
+## 🔬 Metodología
 
 ### Análisis Estadístico
 
@@ -63,11 +63,11 @@ El rendimiento matemático no depende únicamente de habilidades cognitivas. Est
    - Criterio AIC ≈ 40,403
 
 3. **Validación de Supuestos**
-   -  **Normalidad**: Q-Q plot + Shapiro-Wilk (p=0.016) + Kolmogorov-Smirnov (p=0.41) → Aproximadamente normal
-   -  **Homocedasticidad**: Breusch-Pagan (p<0.001) → Ligera heterocedasticidad (común en grandes muestras educativas)
-   -  **Independencia**: Durbin-Watson (p=0.40) → Residuos independientes
-   -  **Linealidad**: Gráficos de regresión parcial confirman relaciones lineales
-   -  **Multicolinealidad**: VIF < 5 en todas las variables
+   - ✅ **Normalidad**: Q-Q plot + Shapiro-Wilk (p=0.016) + Kolmogorov-Smirnov (p=0.41) → Aproximadamente normal
+   - ✅ **Homocedasticidad**: Breusch-Pagan (p<0.001) → Ligera heterocedasticidad (común en grandes muestras educativas)
+   - ✅ **Independencia**: Durbin-Watson (p=0.40) → Residuos independientes
+   - ✅ **Linealidad**: Gráficos de regresión parcial confirman relaciones lineales
+   - ✅ **Multicolinealidad**: VIF < 5 en todas las variables
 
 ### Herramientas y Tecnologías
 
@@ -81,7 +81,7 @@ El rendimiento matemático no depende únicamente de habilidades cognitivas. Est
 
 ---
 
-##  Resultados Principales
+## 📈 Resultados Principales
 
 ### Rendimiento del Modelo
 
@@ -113,7 +113,7 @@ El rendimiento matemático no depende únicamente de habilidades cognitivas. Est
 
 ---
 
-##  Visualizaciones
+## 📊 Visualizaciones
 
 El proyecto incluye 12 figuras que documentan todo el proceso analítico:
 
@@ -150,7 +150,7 @@ El proyecto incluye 12 figuras que documentan todo el proceso analítico:
 </table>
 ---
 
-##  Implicaciones y Recomendaciones
+## 💡 Implicaciones y Recomendaciones
 
 ### Para Política Educativa
 
@@ -168,7 +168,7 @@ El proyecto incluye 12 figuras que documentan todo el proceso analítico:
 
 ---
 
-##  Estructura del Repositorio
+## 📁 Estructura del Repositorio
 
 ```
 PISA-Math-Performance-Costa-Rica/
@@ -189,7 +189,7 @@ PISA-Math-Performance-Costa-Rica/
 
 ---
 
-##  Cómo Reproducir este Análisis
+## 🚀 Cómo Reproducir este Análisis
 
 ### Prerrequisitos
 
@@ -231,7 +231,7 @@ cd PISA-Math-Performance-Costa-Rica
 
 ---
 
-##  Autor
+## 👤 Autor
 
 **Luis Diego Chavarría-Brenes**
 
@@ -241,19 +241,19 @@ cd PISA-Math-Performance-Costa-Rica
 
 ---
 
-##  Licencia
+## 📄 Licencia
 
 Este proyecto utiliza datos públicos de PISA. El código y análisis están disponibles bajo licencia MIT.
 
 ---
 
-##  Contribuciones
+## 🤝 Contribuciones
 
 Este proyecto fue desarrollado como parte del curso "Métodos, Regresión y Diseño de Experimentos" en la Universidad de Costa Rica. Comentarios y sugerencias son bienvenidos.
 
 ---
 
-##  Estadísticas del Proyecto
+## 📊 Estadísticas del Proyecto
 
 - **Líneas de código**: ~500+
 - **Tiempo de análisis**: ~40 horas
