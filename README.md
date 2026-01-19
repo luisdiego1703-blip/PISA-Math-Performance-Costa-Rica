@@ -17,6 +17,21 @@ Este proyecto analiza el desempeño en matemáticas de **6,113 estudiantes costa
 
 El rendimiento matemático no depende únicamente de habilidades cognitivas. Este análisis revela que **factores modificables** como la ansiedad matemática, el clima disciplinario y la prevención del bullying tienen impactos medibles en los resultados académicos, ofreciendo evidencia para **intervenciones educativas basadas en datos**.
 
+### Vista Previa de Resultados
+
+<p align="center">
+  <img src="outputs/figures/figura9.png" alt="Coeficientes del Modelo" width="700"/>
+  <br>
+  <em>Coeficientes del modelo de regresión lineal múltiple con intervalos de confianza</em>
+</p>
+
+<p align="center">
+  <img src="outputs/figures/figura3.png" alt="Matriz de Correlación" width="600"/>
+  <br>
+  <em>Matriz de correlación entre variables predictoras</em>
+</p>
+
+---
 ---
 
 ##  Dataset
