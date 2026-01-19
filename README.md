@@ -17,19 +17,6 @@ Este proyecto analiza el desempeño en matemáticas de **6,113 estudiantes costa
 
 El rendimiento matemático no depende únicamente de habilidades cognitivas. Este análisis revela que **factores modificables** como la ansiedad matemática, el clima disciplinario y la prevención del bullying tienen impactos medibles en los resultados académicos, ofreciendo evidencia para **intervenciones educativas basadas en datos**.
 
-### Vista Previa de Resultados
-
-<p align="center">
-  <img src="outputs/figures/figura9.png" alt="Coeficientes del Modelo" width="700"/>
-  <br>
-  <em>Coeficientes del modelo de regresión lineal múltiple con intervalos de confianza</em>
-</p>
-
-<p align="center">
-  <img src="outputs/figures/figura3.png" alt="Matriz de Correlación" width="600"/>
-  <br>
-  <em>Matriz de correlación entre variables predictoras</em>
-</p>
 
 ---
 ---
@@ -82,7 +69,7 @@ El rendimiento matemático no depende únicamente de habilidades cognitivas. Est
 
 ### Herramientas y Tecnologías
 
-- **Lenguaje**: R (versión 4.x)
+- **Lenguaje**: R (versión 4.5.2)
 - **Entorno**: RStudio, R Markdown
 - **Paquetes principales**:
   - `tidyverse`, `dplyr`, `ggplot2` - Manipulación y visualización
@@ -137,17 +124,32 @@ El proyecto incluye 12 figuras que documentan todo el proceso analítico:
 
 ### Ejemplos Visuales
 
-![Matriz de Correlación](outputs/figures/figura3.png)
-*Matriz de correlación entre variables del modelo*
-
-![Coeficientes del Modelo](outputs/figures/figura9.png)
-*Coeficientes estimados del modelo con intervalos de confianza al 95%*
-
-![Q-Q Plot](outputs/figures/figura10.png)
-*Gráfico Q-Q para validación de normalidad de residuos*
-
-![Residuos vs Ajustados](outputs/figures/figura11.png)
-*Diagnóstico de homocedasticidad: residuos vs valores ajustados*
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="outputs/figures/figura3.png" alt="Matriz de Correlación" width="90%"/>
+      <br>
+      <em>Matriz de correlación entre variables del modelo</em>
+    </td>
+    <td width="50%" align="center">
+      <img src="outputs/figures/figura9.png" alt="Coeficientes" width="90%"/>
+      <br>
+      <em>Coeficientes estimados con intervalos de confianza al 95%</em>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="outputs/figures/figura10.png" alt="Q-Q Plot" width="90%"/>
+      <br>
+      <em>Gráfico Q-Q para validación de normalidad</em>
+    </td>
+    <td width="50%" align="center">
+      <img src="outputs/figures/figura11.png" alt="Residuos" width="90%"/>
+      <br>
+      <em>Diagnóstico de homocedasticidad</em>
+    </td>
+  </tr>
+</table>
 ---
 
 ##  Implicaciones y Recomendaciones
